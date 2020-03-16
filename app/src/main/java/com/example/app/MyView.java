@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -35,6 +36,9 @@ public class MyView extends View {
             HashMap<String,Float> color = line.get(0);
             paint.setColor(color.get("color").intValue());//重新繪製時,繪製的顏色
             for (int i=2;i<line.size();i++){
+                //因為產生新線的line[0] = color
+                //所以i = 0 時,p0不再擁有x,y軸,需要至少i = 1才會有第一個點的x,y軸
+                //每次產生新線,將會一次賦予line[color,xy,xy]的值
                 HashMap<String,Float> p0 = line.get(i-1);
                 HashMap<String,Float> p1 = line.get(i);
                 canvas.drawLine(p0.get("x"),p0.get("y"),p1.get("x"),p1.get("y"),paint);
@@ -57,6 +61,7 @@ public class MyView extends View {
             LinkedList<HashMap<String,Float>> line = new LinkedList<>();
 
             HashMap<String,Float> setting = new HashMap<>();//每條新線加入顏色
+            //目前產生新線的line[0] = color
             setting.put("color", (float) color);
             line.add(setting);
             lines.add(line);
