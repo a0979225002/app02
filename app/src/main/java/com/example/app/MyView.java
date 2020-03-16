@@ -15,6 +15,7 @@ import java.util.LinkedList;
 
 public class MyView extends View {
     Paint paint;//畫筆
+    private int color = Color.BLUE;
     private LinkedList<LinkedList<HashMap<String,Float>>> lines,garbage_can;//接收的xy軸
     public MyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -22,7 +23,7 @@ public class MyView extends View {
         lines = new LinkedList<>();
         garbage_can = new LinkedList<>();
         paint.setStrokeWidth(10);
-        paint.setColor(Color.BLUE);
+        paint.setColor(color);
     }
 
     //畫畫
@@ -31,12 +32,21 @@ public class MyView extends View {
         super.onDraw(canvas);
 
         for (LinkedList<HashMap<String,Float>>line:lines){
-            for (int i=1;i<line.size();i++){
+            HashMap<String,Float> color = line.get(0);
+            paint.setColor(color.get("color").intValue());//重新繪製時,繪製的顏色
+            for (int i=2;i<line.size();i++){
                 HashMap<String,Float> p0 = line.get(i-1);
                 HashMap<String,Float> p1 = line.get(i);
                 canvas.drawLine(p0.get("x"),p0.get("y"),p1.get("x"),p1.get("y"),paint);
             }
         }
+    }
+    public void setColor(int newcolor){
+        color = newcolor;
+        invalidate();
+    }
+    public int getColor(){
+        return color;
     }
 
     //監聽
@@ -45,6 +55,10 @@ public class MyView extends View {
         if (event.getAction() == MotionEvent.ACTION_DOWN){
             garbage_can.clear();//加入新的線的時候刪除垃圾桶內的線,防止產生新線時,又給予回覆下一動
             LinkedList<HashMap<String,Float>> line = new LinkedList<>();
+
+            HashMap<String,Float> setting = new HashMap<>();//每條新線加入顏色
+            setting.put("color", (float) color);
+            line.add(setting);
             lines.add(line);
         }
 
